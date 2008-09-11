@@ -1,0 +1,36 @@
+Block(block:1,IConst(0)):	IConst(0)
+Block(block:1,IConst(0)):	IStore(1)
+Block(block:1,IConst(0)):	IConst(0)
+Block(block:1,IConst(0)):	IStore(2)
+
+v1 = 0
+v2 = 0
+
+Block(block:4,ILoad(2)):	ILoad(2)
+Block(block:4,ILoad(2)):	BIPush(100)
+Block(block:4,ILoad(2)):	IfIcmpgt()
+
+If v2 > 100 goto B2
+
+Block(block:3,ILoad(1)):	ILoad(1)
+Block(block:3,ILoad(1)):	ILoad(2)
+Block(block:3,ILoad(1)):	IAdd()
+Block(block:3,ILoad(1)):	IStore(1)
+Block(block:3,ILoad(1)):	IInc(2,1)
+Block(block:3,ILoad(1)):	Goto()
+
+v1 = v1 + v2
+v2+=1
+goto B4
+
+Block(block:2,GetStatic(java.lang.System,out,java.io.PrintStream)):	GetStatic(java.lang.System,out,java.io.PrintStream)
+Block(block:2,GetStatic(java.lang.System,out,java.io.PrintStream)):	New(java.lang.StringBuilder)
+Block(block:2,GetStatic(java.lang.System,out,java.io.PrintStream)):	Dup()
+Block(block:2,GetStatic(java.lang.System,out,java.io.PrintStream)):	InvokeSpecial(java.lang.StringBuilder,<init>,List(),void)
+Block(block:2,GetStatic(java.lang.System,out,java.io.PrintStream)):	LDC(sum =)
+Block(block:2,GetStatic(java.lang.System,out,java.io.PrintStream)):	InvokeVirtual(java.lang.StringBuilder,append,List(java.lang.String),java.lang.StringBuilder)
+Block(block:2,GetStatic(java.lang.System,out,java.io.PrintStream)):	ILoad(1)
+Block(block:2,GetStatic(java.lang.System,out,java.io.PrintStream)):	InvokeVirtual(java.lang.StringBuilder,append,List(int),java.lang.StringBuilder)
+Block(block:2,GetStatic(java.lang.System,out,java.io.PrintStream)):	InvokeVirtual(java.lang.StringBuilder,toString,List(),java.lang.String)
+Block(block:2,GetStatic(java.lang.System,out,java.io.PrintStream)):	InvokeVirtual(java.io.PrintStream,println,List(java.lang.String),void)
+Block(block:2,GetStatic(java.lang.System,out,java.io.PrintStream)):	Return()
