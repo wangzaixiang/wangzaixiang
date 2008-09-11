@@ -1,4 +1,4 @@
-# java2js ideas
+#summary java2js ideas
 = Introduction =
 
   # add loop support
