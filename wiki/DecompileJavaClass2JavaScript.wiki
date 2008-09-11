@@ -1,4 +1,4 @@
-#Decompile Java Class to JavaScript
+#Decompile Java Class to Javascript
 
 = Introduction =
 
