@@ -15,16 +15,26 @@ object SimpleTest {
       }
     }
 
-  
-  abstract class Instruction;
+  case class Block(name:String, first:Instruction) {
+    first.block = this
+  }
+
+  abstract class Instruction {
+    var block: Block = null;
+    var prev,next: Instruction = null;
+  }
   case class IConst(operand:Int) extends Instruction;
   case class IStore(operand:Int) extends Instruction;
   case class ILoad(operand:Int) extends Instruction;
   case class BIPush(operand:Byte) extends Instruction;
-  case class IfIcmpgt(target: Instruction) extends Instruction;
+  case class IfIcmpgt() extends Instruction{
+    var target: Instruction = null
+  }
   case class IAdd extends Instruction;
   case class IInc(pos: Int, value: Int) extends Instruction;
-  case class Goto(target:Instruction) extends Instruction;
+  case class Goto() extends Instruction {
+    var target: Instruction = null
+  }
   case class GetStatic(clazz: String, field: String, signature: String) extends Instruction;
   case class New(clazz:String) extends Instruction;
   case class Dup() extends Instruction;
@@ -40,14 +50,14 @@ object SimpleTest {
     val i3 = IStore(2)
     val i4 = ILoad(2)
     val i5 = BIPush(100)
+    var i7 = IfIcmpgt()
     val i10 = ILoad(1)
     val i11 = ILoad(2)
     val i12 = IAdd()
     val i13 = IStore(1)
     val i14 = IInc(2,1)
-    val i17 = Goto(i4);
+    val i17 = Goto();
     val i20 = GetStatic("java.lang.System", "out", "java.io.PrintStream")
-    var i7 = IfIcmpgt(i20)
     val i23 = New("java.lang.StringBuilder")
     val i26 = Dup()
     val i27 = InvokeSpecial("java.lang.StringBuilder", "<init>", Nil, "void");
@@ -58,6 +68,9 @@ object SimpleTest {
     val i39 = InvokeVirtual("java.lang.StringBuilder", "toString", Nil, "java.lang.String")
     val i42 = InvokeVirtual("java.io.PrintStream", "println", List("java.lang.String"),"void")
     val i45 = Return()
+    
+    i17.target = i4;
+    i7.target = i20;
 
     return List( i0, i1 , i2 , i3 , i4 , i5 , i7 , i10 , i11, i12, i13 , 
       i14 , i17 , i20 , i23 , i26 , i27 , i30 , i32, i35 , i36 , i39 , i42 , i45 )
@@ -105,7 +118,7 @@ object SimpleTest {
           }
         case ILoad(op) => stack = LocalVar(op) :: stack;
         case BIPush(op) => stack = Constant("byte", "" + op) :: stack
-        case IfIcmpgt(target) =>  stack match { case op2 :: op1 :: tail =>
+        case IfIcmpgt() =>  stack match { case op2 :: op1 :: tail =>
           {
             println( IfStmt(op1, ">", op2) );
             stack = tail;
@@ -114,7 +127,7 @@ object SimpleTest {
           {
             println( SetVar(pos, Add(LocalVar(pos), Constant("int", ""+value)) ) );
           }
-        case Goto(target) => println( GotoStmt(target) );
+        case go: Goto => println( GotoStmt(go.target) );
         case GetStatic(clazz, field, signature) =>
           {
             stack = PathExpr(clazz, field) :: stack;
