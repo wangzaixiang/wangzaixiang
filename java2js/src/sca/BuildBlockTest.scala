@@ -78,7 +78,7 @@ object BuildBlockTest {
     val i13 = IStore(1)
     val i14 = IInc(2,1)
     val i17 = Goto();
-    val i20 = GetStatic("java.lang.System", "out", "java.io.PrintStream")
+    lazy val i20 = GetStatic("java.lang.System", "out", "java.io.PrintStream")
     val i23 = New("java.lang.StringBuilder")
     val i26 = Dup()
     val i27 = InvokeSpecial("java.lang.StringBuilder", "<init>", Nil, "void");

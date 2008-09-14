@@ -50,14 +50,14 @@ object SimpleTest {
     val i3 = IStore(2)
     val i4 = ILoad(2)
     val i5 = BIPush(100)
-    var i7 = IfIcmpgt()
+    val i7 = IfIcmpgt()
     val i10 = ILoad(1)
     val i11 = ILoad(2)
     val i12 = IAdd()
     val i13 = IStore(1)
     val i14 = IInc(2,1)
     val i17 = Goto();
-    val i20 = GetStatic("java.lang.System", "out", "java.io.PrintStream")
+    lazy val i20 = GetStatic("java.lang.System", "out", "java.io.PrintStream")
     val i23 = New("java.lang.StringBuilder")
     val i26 = Dup()
     val i27 = InvokeSpecial("java.lang.StringBuilder", "<init>", Nil, "void");
