@@ -22,8 +22,8 @@ object Test2 extends Application {
     override def underlying = tests.asInstanceOf[List[Student]]    
   } 
   
-  // ÎÒÃÇÄÜ·ñÀûÓÃScalaÀ´×÷ÎªÊý¾Ý¿â²éÑ¯µÄNative QueryÓïÑÔ£¬¶øÍ¨¹ýÒ»¸öËùÎ½µÄ
-  // ²åÈëÊ½±àÒëÆ÷À´ÊµÏÖ½«Æä×ª»¯³ÉÎªAST£¬²¢×Ô¶¯×ª»¯ÎªEJBQL£¿
+  // æˆ‘ä»¬èƒ½å¦åˆ©ç”¨Scalaæ¥ä½œä¸ºæ•°æ®åº“æŸ¥è¯¢çš„Native Queryè¯­è¨€ï¼Œè€Œé€šè¿‡ä¸€ä¸ªæ‰€è°“çš„
+  // æ’å…¥å¼ç¼–è¯‘å™¨æ¥å®žçŽ°å°†å…¶è½¬åŒ–æˆä¸ºASTï¼Œå¹¶è‡ªåŠ¨è½¬åŒ–ä¸ºEJBQLï¼Ÿ
   testsList.filter( it => it.name == "wangzx" );
   
   for(st <- testsList){
