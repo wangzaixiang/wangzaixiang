@@ -22,6 +22,10 @@ object Test2 extends Application {
     override def underlying = tests.asInstanceOf[List[Student]]    
   } 
   
+  // 我们能否利用Scala来作为数据库查询的Native Query语言，而通过一个所谓的
+  // 插入式编译器来实现将其转化成为AST，并自动转化为EJBQL？
+  testsList.filter( it => it.name == "wangzx" );
+  
   for(st <- testsList){
     Console println st
   }
