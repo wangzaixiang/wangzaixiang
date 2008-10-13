@@ -2,7 +2,8 @@ package com.hotye.server.net3ecp.handler.ew
 
 import javax.persistence._
 import java.util.Date
-import TransType._, SubAcctType._
+import TransType._
+import SubAcctType._
 
 class EWLogicServiceImpl extends EwService {
   
@@ -28,41 +29,40 @@ class EWLogicServiceImpl extends EwService {
   def updateEwAvailableAccount(_req: EwService.UpdateEWAvailableAccountReq): Int = {
     
     _req.transType match {
-      case RechargeEcp | RechargeGnete | FreezeToAvailable =>
-        assert(_req.amount > 0)
-      case DirectPay | AvailableToFreeze =>
-        assert(_req.amount < 0)
-      case _ =>
-        assert(false)
+      case RechargeEcp | RechargeGnete | FreezeToAvailable => // 充值类交易
+        assert(_req.amount > 0, "金额不正确")
+      case DirectPay | AvailableToFreeze =>	// 支付、冻结类交易
+        assert(_req.amount < 0, "金额不正确")
+      case _ =>	
+        assert(false, "无效交易类型")
     }
     
     val _account = queryEwAccount(_req.userId)
     assert(_account != null, "用户尚未开通电子钱包")
     
     var _accAvail, _accFreeze: EWSubAccount = null
-    var _total: BigDecimal = 0
-    var _subs = _account.subAccounts;
-    _subs.filter(_.subTypeCode==Available) :::_subs.filter(_.subTypeCode==Freeze) match {
-      case a :: b :: Nil =>
-        _accAvail = a; _accFreeze = b;
-        _total = a.balance + b.balance	// 可用余额+冻结余额
-      case a :: Nil =>
-        _accAvail = a
-        _total = _accAvail.balance
-      case _ =>
+    var _total: BigDecimal = _req.amount
+    _account.subAccounts.find(_.subTypeCode==Available) match {
+      case Some(x) =>  _accAvail = x;    _total += x.balance
+      case None =>
+    }
+    _account.subAccounts.find(_.subTypeCode==Freeze) match {
+      case Some(x) =>  _accFreeze = x;    _total += x.balance
+      case None=>
     }
 
+    assert(_accAvail != null, "用户未开通电子钱包")
     assert(_accAvail.balance + _req.amount > 0, "余额不足")
     assert(_total<=3000, "电子钱包上线为：3000元，已经超额!")
     
-    //修改子账户
-    { sub: EWSubAccount =>
-      sub.balance = sub.balance + _req.amount
-      sub.lastUpdateTime = new Date
+    //修改子账户记录
+    { 
+      _accAvail.balance = _accAvail.balance + _req.amount
+      _accAvail.lastUpdateTime = new Date
       
       if(_req.amount>0 && _req.transType != FreezeToAvailable)
-        sub.accumulatedTotal += _req.amount
-    }.apply(_accAvail)
+        _accAvail.accumulatedTotal += _req.amount
+    }
         
     // 记录流水
     val _ewJournal = new EWJournal {
@@ -73,7 +73,7 @@ class EWLogicServiceImpl extends EwService {
       transAmount = _req.amount
       subAcctBalance = _accAvail.balance
       subTypeCode = _accAvail.subTypeCode
-      servTypeCode = null //TODO
+      servTypeCode = _req.serviceCode
       transTypeCode = _req.transType
       remark = _req.remark
       transStatus = "00"
