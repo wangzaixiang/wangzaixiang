@@ -13,6 +13,7 @@ object TransType {
   val RechargeGnete = "A101"
   val FreezeToAvailable = "A109"
 }
+
 object SubAcctType {
   val Available = "01"
   val Freeze = "02"
@@ -21,9 +22,21 @@ object SubAcctType {
 
 object EwService {
   abstract class UpdateEWAvailableAccountReq {
+    /** 
+     * 用户Id
+     */
     var userId: Int
+    /** 
+     * 交易流水号 
+     */
     var journalNo: Int
+    /** 
+     * 交易金额，对充值类交易，>0,支付类交易,<0
+     */
     var amount: BigDecimal
+    /**
+     * 服务类型
+     */
     var serviceCode: String
     var transType: String
     var remark: String
