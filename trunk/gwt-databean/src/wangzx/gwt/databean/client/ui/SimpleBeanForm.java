@@ -1,6 +1,6 @@
 package wangzx.gwt.databean.client.ui;
 
-import wangzx.gwt.databean.client.model.BeanReflection;
+import wangzx.gwt.databean.client.model.DynamicBean;
 
 import com.google.gwt.user.client.ui.SimplePanel;
 
@@ -28,7 +28,7 @@ public class SimpleBeanForm extends SimplePanel {
 
 	private int gridColumns;
 
-	public SimpleBeanForm(BeanReflection bean) {
+	public SimpleBeanForm(DynamicBean bean) {
 		
 		String[] fields = bean.getFieldNames();
 		

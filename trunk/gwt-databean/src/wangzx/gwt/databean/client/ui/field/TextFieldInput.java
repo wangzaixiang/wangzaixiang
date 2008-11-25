@@ -1,6 +1,6 @@
 package wangzx.gwt.databean.client.ui.field;
 
-import wangzx.gwt.databean.client.model.BeanReflection;
+import wangzx.gwt.databean.client.model.DynamicBean;
 
 import com.google.gwt.user.client.ui.TextBox;
 
@@ -17,7 +17,7 @@ import com.google.gwt.user.client.ui.TextBox;
  */
 public class TextFieldInput {
 	
-	private	BeanReflection xbean;
+	private	DynamicBean xbean;
 	private	String field;
 	
 	

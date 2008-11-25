@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
-public abstract class AbstractBeanReflection implements BeanReflection {
+public abstract class AbstractBeanReflection implements DynamicBean {
 
 	protected List<PropertyChangeListener> listeners = new
 		Vector<PropertyChangeListener>();
@@ -37,11 +37,7 @@ public abstract class AbstractBeanReflection implements BeanReflection {
 	}
 
 
-	public FieldInfo getFieldInfo(String field) {
-		return null;
-	}
-
-	public String getFieldInfoX(String field, String name) {
+	public FieldMetaData getFieldInfo(String field) {
 		return null;
 	}
 

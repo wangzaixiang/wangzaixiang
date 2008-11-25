@@ -4,7 +4,7 @@ import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.Map;
 
-public class FieldInfoImpl implements FieldInfo {
+public class FieldMetaData implements FieldInfo {
 
 	private String category;
 	private Class<?> datatype;
@@ -22,63 +22,63 @@ public class FieldInfoImpl implements FieldInfo {
 	private boolean updateEditable;
 	private boolean createEditable;
 	
-	public FieldInfoImpl category(String category){
+	public FieldMetaData category(String category){
 		this.category = category;
 		return this;
 	}
-	public FieldInfoImpl datatype(Class<?> datatype){
+	public FieldMetaData datatype(Class<?> datatype){
 		this.datatype = datatype;
 		return this;
 	}
-	public FieldInfoImpl description(String description){
+	public FieldMetaData description(String description){
 		this.description = description;
 		return this;
 	}
-	public FieldInfoImpl fractions(int fractions){
+	public FieldMetaData fractions(int fractions){
 		this.fractions = fractions;
 		return this;
 	}
-	public FieldInfoImpl icon(String icon){
+	public FieldMetaData icon(String icon){
 		this.icon = icon;
 		return this;
 	}
-	public FieldInfoImpl label(String label){
+	public FieldMetaData label(String label){
 		this.label = label;
 		return this;
 	}
-	public FieldInfoImpl length(int length){
+	public FieldMetaData length(int length){
 		this.length = length;
 		return this;
 	}
-	public FieldInfoImpl regexp(String regexp){
+	public FieldMetaData regexp(String regexp){
 		this.regexp = regexp;
 		return this;
 	}
-	public FieldInfoImpl required(boolean required){
+	public FieldMetaData required(boolean required){
 		this.required = required;
 		return this;
 	}
-	public FieldInfoImpl ui(UI ui){
+	public FieldMetaData ui(UI ui){
 		this.ui = ui;
 		return this;
 	}
-	public FieldInfoImpl enumKey(Class<?> enumKey){
+	public FieldMetaData enumKey(Class<?> enumKey){
 		this.enumKey = enumKey;
 		return this;
 	}
-	public FieldInfoImpl extra(String key, String value) {
+	public FieldMetaData extra(String key, String value) {
 		extras.put(key, value);
 		return this;
 	}
-	public FieldInfoImpl enumerations(EnumType<?>[] enumerations) {
+	public FieldMetaData enumerations(EnumType<?>[] enumerations) {
 		this.enumerations = enumerations;
 		return this;
 	}
-	public FieldInfoImpl createEditable(boolean createEditable) {
+	public FieldMetaData createEditable(boolean createEditable) {
 		this.createEditable = createEditable;
 		return this;
 	}
-	public FieldInfoImpl updateEditable(boolean updateEditable) {
+	public FieldMetaData updateEditable(boolean updateEditable) {
 		this.updateEditable = updateEditable;
 		return this;
 	}
