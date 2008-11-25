@@ -6,7 +6,7 @@ import java.util.Map;
 
 import wangzx.gwt.databean.client.model.AbstractBeanReflection;
 import wangzx.gwt.databean.client.model.BeanInfo;
-import wangzx.gwt.databean.client.model.BeanInfoImpl;
+import wangzx.gwt.databean.client.model.BeanMetadata;
 import wangzx.gwt.databean.client.model.FieldInfo;
 import wangzx.gwt.databean.client.model.FieldMetaData;
 import wangzx.gwt.databean.client.model.FieldInfoXes;
@@ -32,7 +32,7 @@ public class Book_BeanReflection extends AbstractBeanReflection {
 	}
 
 	static {
-		shared_beanInfo = new BeanInfoImpl().label("Book");
+		shared_beanInfo = new BeanMetadata().label("Book");
 		shared_fieldInfos = new HashMap<String, FieldInfo>();
 		shared_fieldInfos.put("name", new FieldMetaData().label("书名")
 				.length(18));
