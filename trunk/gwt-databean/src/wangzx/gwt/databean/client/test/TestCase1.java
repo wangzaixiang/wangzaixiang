@@ -3,13 +3,13 @@ package wangzx.gwt.databean.client.test;
 import java.util.Date;
 
 import wangzx.gwt.databean.client.model.BeanInfo;
-import wangzx.gwt.databean.client.model.EnumInfo;
 import wangzx.gwt.databean.client.model.EnumType;
 import wangzx.gwt.databean.client.model.FieldInfo;
 import wangzx.gwt.databean.client.model.FieldInfoX;
 import wangzx.gwt.databean.client.model.FieldInfoXes;
 import wangzx.gwt.databean.client.model.ReflectibleBean;
 import wangzx.gwt.databean.client.model.BeanReflection;
+import wangzx.gwt.databean.client.model.FieldInfo.UI;
 import wangzx.gwt.databean.client.ui.SimpleBeanForm;
 
 import com.google.gwt.core.client.EntryPoint;
@@ -72,7 +72,7 @@ public class TestCase1 implements EntryPoint {
 		@FieldInfo(label="状态")
 		private BookStatus status;
 		
-		@FieldInfo(label="简要介绍", ui="textarea")
+		@FieldInfo(label="简要介绍", ui=UI.textarea)
 		@FieldInfoXes(
 				{	@FieldInfoX(name="textarea.width", value="80"),
 					@FieldInfoX(name="textarea.height", value="5") } )

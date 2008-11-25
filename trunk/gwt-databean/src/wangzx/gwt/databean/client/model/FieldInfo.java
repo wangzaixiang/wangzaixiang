@@ -1,6 +1,19 @@
 package wangzx.gwt.databean.client.model;
 
 public @interface FieldInfo {
+	
+	public enum UI {
+		text,
+		textarea,
+		password, 
+		calendar, 
+		select,
+		checkbox,
+		radiobox,
+		file,
+		image
+	}
+	
 
 	/**
 	 * 显示名称
@@ -34,8 +47,9 @@ public @interface FieldInfo {
 
 	/**
 	 * 显示ui组件
+	 * text, textarea, password, calendar, select, checkbox, file, image
 	 */
-	String ui() default "";
+	UI ui() default UI.text;
 	
 	/**
 	 * 缺省图标

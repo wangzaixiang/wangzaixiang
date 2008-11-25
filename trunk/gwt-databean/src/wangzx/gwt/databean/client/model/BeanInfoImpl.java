@@ -4,6 +4,7 @@ import java.lang.annotation.Annotation;
 
 public class BeanInfoImpl implements BeanInfo {
 
+	private	String name;
 	private String description;
 	private	String icon;
 	private	String label;
@@ -23,6 +24,10 @@ public class BeanInfoImpl implements BeanInfo {
 		this.icon = icon;
 		return this;
 	}
+	public BeanInfoImpl name(String name){
+		this.name = name;
+		return this;
+	}
 	
 	
 	public String description() {
@@ -37,6 +42,10 @@ public class BeanInfoImpl implements BeanInfo {
 		return label;
 	}
 
+	public String name() {
+		return name;
+	}
+	
 	public Class<? extends Annotation> annotationType() {
 		return BeanInfo.class;
 	}

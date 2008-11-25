@@ -1,0 +1,23 @@
+
+@BeanInfo( resourcePath="..." )
+public class Product implements ResouceContainer {
+
+	@FieldInfo(ui=UI.image)
+	private	String image;	// simple store the image path
+
+}
+
+// display mode
+image: <img src="resource-path/image-name" > 
+
+
+// edit mode
+image: <input type=file >
+
+本地选择一个文件时，采用 post 模式上传到  /resourcePath/imageName 下,一般的，该文件名是固定的，以便于简单处理。
+
+
+@FieldInfo(ui=UI.file)
+private	String	filename;
+
+
