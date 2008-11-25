@@ -15,7 +15,7 @@ public class FieldInfoImpl implements FieldInfo {
 	private int length;
 	private String regexp;
 	private boolean required;
-	private String ui;
+	private UI ui;
 	private	Map<String, String> extras = new HashMap<String, String>();
 	private Class<?> enumKey;
 	private	EnumType<?>[] enumerations;
@@ -58,7 +58,7 @@ public class FieldInfoImpl implements FieldInfo {
 		this.required = required;
 		return this;
 	}
-	public FieldInfoImpl ui(String ui){
+	public FieldInfoImpl ui(UI ui){
 		this.ui = ui;
 		return this;
 	}
@@ -120,7 +120,7 @@ public class FieldInfoImpl implements FieldInfo {
 		return this.required;
 	}
 
-	public String ui() {
+	public UI ui() {
 		return this.ui;
 	}
 	

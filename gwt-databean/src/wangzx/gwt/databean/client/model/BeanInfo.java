@@ -3,6 +3,11 @@ package wangzx.gwt.databean.client.model;
 public @interface BeanInfo {
 
 	/**
+	 * Bean Name
+	 */
+	String name() default "";
+	
+	/**
 	 * 显示名称
 	 */
 	String label() default "";
@@ -15,6 +20,6 @@ public @interface BeanInfo {
 	/**
 	 * 缺省图标
 	 */
-	String icon() default "";	
-
+	String icon() default "";
+	
 }

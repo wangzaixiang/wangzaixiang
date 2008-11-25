@@ -11,6 +11,7 @@ import wangzx.gwt.databean.client.model.FieldInfo;
 import wangzx.gwt.databean.client.model.FieldInfoImpl;
 import wangzx.gwt.databean.client.model.FieldInfoXes;
 import wangzx.gwt.databean.client.model.ReflectibleBean;
+import wangzx.gwt.databean.client.model.FieldInfo.UI;
 import wangzx.gwt.databean.client.test.TestCase1.Book;
 import wangzx.gwt.databean.client.test.TestCase1.BookStatus;
 
@@ -42,7 +43,7 @@ public class Book_BeanReflection extends AbstractBeanReflection {
 		shared_fieldInfos.put("price", new FieldInfoImpl().label("价格"));
 		shared_fieldInfos.put("status", new FieldInfoImpl().label("状态").enumKey(Integer.class)
 				.enumerations(BookStatus.values()));
-		shared_fieldInfos.put("abbr", new FieldInfoImpl().label("简要介绍").ui("textarea")
+		shared_fieldInfos.put("abbr", new FieldInfoImpl().label("简要介绍").ui(UI.textarea)
 				.extra("textarea.width","80").extra("textarea.height","5"));
 		
 	}
