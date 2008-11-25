@@ -22,4 +22,9 @@ public @interface BeanInfo {
 	 */
 	String icon() default "";
 	
+	/**
+	 * 申明Bean的Category
+	 */
+	Category[] categories() default {};
+	
 }
