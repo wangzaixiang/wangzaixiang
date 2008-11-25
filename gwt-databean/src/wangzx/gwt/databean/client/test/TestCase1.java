@@ -8,7 +8,7 @@ import wangzx.gwt.databean.client.model.FieldInfo;
 import wangzx.gwt.databean.client.model.FieldInfoX;
 import wangzx.gwt.databean.client.model.FieldInfoXes;
 import wangzx.gwt.databean.client.model.ReflectibleBean;
-import wangzx.gwt.databean.client.model.BeanReflection;
+import wangzx.gwt.databean.client.model.DynamicBean;
 import wangzx.gwt.databean.client.model.FieldInfo.UI;
 import wangzx.gwt.databean.client.ui.SimpleBeanForm;
 
@@ -125,7 +125,7 @@ public class TestCase1 implements EntryPoint {
 	
 	public void onModuleLoad() {
 		
-		BeanReflection bean = GWT.create(Book.class);
+		DynamicBean bean = GWT.create(Book.class);
 		Book book = new Book();
 		bean.setDelegator(book);
 		

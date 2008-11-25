@@ -8,7 +8,7 @@ import wangzx.gwt.databean.client.model.AbstractBeanReflection;
 import wangzx.gwt.databean.client.model.BeanInfo;
 import wangzx.gwt.databean.client.model.BeanInfoImpl;
 import wangzx.gwt.databean.client.model.FieldInfo;
-import wangzx.gwt.databean.client.model.FieldInfoImpl;
+import wangzx.gwt.databean.client.model.FieldMetaData;
 import wangzx.gwt.databean.client.model.FieldInfoXes;
 import wangzx.gwt.databean.client.model.ReflectibleBean;
 import wangzx.gwt.databean.client.model.FieldInfo.UI;
@@ -34,16 +34,16 @@ public class Book_BeanReflection extends AbstractBeanReflection {
 	static {
 		shared_beanInfo = new BeanInfoImpl().label("Book");
 		shared_fieldInfos = new HashMap<String, FieldInfo>();
-		shared_fieldInfos.put("name", new FieldInfoImpl().label("书名")
+		shared_fieldInfos.put("name", new FieldMetaData().label("书名")
 				.length(18));
-		shared_fieldInfos.put("author", new FieldInfoImpl().label("作者").length(
+		shared_fieldInfos.put("author", new FieldMetaData().label("作者").length(
 				12));
-		shared_fieldInfos.put("publisher", new FieldInfoImpl().label("出版社"));
-		shared_fieldInfos.put("publishDate", new FieldInfoImpl().label("出版日期"));
-		shared_fieldInfos.put("price", new FieldInfoImpl().label("价格"));
-		shared_fieldInfos.put("status", new FieldInfoImpl().label("状态").enumKey(Integer.class)
+		shared_fieldInfos.put("publisher", new FieldMetaData().label("出版社"));
+		shared_fieldInfos.put("publishDate", new FieldMetaData().label("出版日期"));
+		shared_fieldInfos.put("price", new FieldMetaData().label("价格"));
+		shared_fieldInfos.put("status", new FieldMetaData().label("状态").enumKey(Integer.class)
 				.enumerations(BookStatus.values()));
-		shared_fieldInfos.put("abbr", new FieldInfoImpl().label("简要介绍").ui(UI.textarea)
+		shared_fieldInfos.put("abbr", new FieldMetaData().label("简要介绍").ui(UI.textarea)
 				.extra("textarea.width","80").extra("textarea.height","5"));
 		
 	}
