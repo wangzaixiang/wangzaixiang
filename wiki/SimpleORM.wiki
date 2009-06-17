@@ -10,6 +10,16 @@ DatabaseSession.map(Interface dao) 支持自动根据接口生成一个实现类
 
 如何理解DatabaseSession呢?DatabaseSession是一个将iBatis的特性和Spring JDBCTemplate相结合的概念产品
 
+{{{
+List<Student> students = dbSession.query(Student.class) //
+					.sql("select * from t_student where name like ? and no < ?", "wang%", 10) //
+					.queryList();
+
+			for (Student s : students) {
+				System.out.println(s);
+			}
+}}}
+
 = Details =
 
 Add your content here.  Format your content with:
