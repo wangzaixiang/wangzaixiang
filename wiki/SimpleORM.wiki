@@ -12,12 +12,12 @@ DatabaseSession.map(Interface dao) 支持自动根据接口生成一个实现类
 
 {{{
 List<Student> students = dbSession.query(Student.class) //
-					.sql("select * from t_student where name like ? and no < ?", "wang%", 10) //
-					.queryList();
+	.sql("select * from t_student where name like ? and no < ?", "wang%", 10) //
+	.queryList();
 
-			for (Student s : students) {
-				System.out.println(s);
-			}
+for (Student s : students) {
+	System.out.println(s);
+}
 }}}
 
 = Details =
