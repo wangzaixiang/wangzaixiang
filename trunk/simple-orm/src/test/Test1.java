@@ -14,10 +14,13 @@ public class Test1 {
 		Class<?> driver = org.h2.Driver.class;
 		System.out.println(driver);
 		Connection conn = DriverManager.getConnection("jdbc:h2:db/test", "sa",
-				""); // »ñµÃÒ»¸öÁ¬½Ó
+				""); // èŽ·å¾—ä¸€ä¸ªè¿žæŽ¥
 
 		DatabaseSession dbSession = DatabaseSession.createInstance(conn);
 
+		/**
+		 * 
+		 */
 		StudentDAO dao = dbSession.map(StudentDAO.class);
 
 		// test 1 -- select a list
@@ -49,6 +52,19 @@ public class Test1 {
 				System.out.println(s);
 			}
 		}
+		
+		// test 3
+		{
+			System.out.println("\n\ntest direct sql for wang%");
+			List<Student> students = dbSession.query(Student.class) //
+					.sql("select * from t_student where name like ? and no < ?", "wang%", 10) //
+					.queryList();
+
+			for (Student s : students) {
+				System.out.println(s);
+			}
+		}
+
 
 		// test 4 --
 		{
@@ -73,7 +89,7 @@ public class Test1 {
 		}
 		
 		{
-			// »ñµÃÒ»¸ösequenceµÄµ±Ç°Öµ
+			// èŽ·å¾—ä¸€ä¸ªsequenceçš„å½“å‰å€¼
 			Integer integer = dbSession.query(Integer.class).sql("select test_seq.nextval from dual").querySingle();
 			System.out.println("nextval is " + integer);
 

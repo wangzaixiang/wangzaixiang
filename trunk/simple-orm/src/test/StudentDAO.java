@@ -18,10 +18,10 @@ public interface StudentDAO {
 	@Insert
 	Student	insert(Student student) throws SQLException;
 	
-	@Delete("delete from t_student where no = :1")
+	@Delete("delete from t_student where no = ?")
 	boolean	delete(int no) throws SQLException;
 	
-	@Delete("delete from t_student where no = #no")
+	@Delete("delete from t_student where no = ?")
 	boolean delete(Student student) throws SQLException;
 	
 }
