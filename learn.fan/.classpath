@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="javasrc"/>
+	<classpathentry kind="src" path="src/foo"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/fan-1.0.44"/>
+	<classpathentry kind="lib" path="jstub/foo.jar"/>
+	<classpathentry kind="lib" path="jstub/compiler.jar" sourcepath=""/>
+	<classpathentry kind="output" path="classes"/>
+</classpath>
