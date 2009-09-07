@@ -39,22 +39,27 @@
 	"Return the nodes for next level elements" 
 	[Node path]
 	(if (= path :text!)
-			(text-for-node Node) 
+			(cons (text-for-node Node) ())
 			(filter #(= path (:tag %)) (:content Node))
 	)
 )
 (defn- xpath-2 [Nodes path]
-	(if (map? Nodes)
-			(xpath-1 Nodes path)	
+	(if (:tag Nodes)
+			(xpath-1 Nodes path)	;
 			(apply concat (map #(xpath-1 % path) Nodes))	;; [node1 node2]
 	)
 )
 
 
-(defn xpath [Nodes Pathes]
-	(if (empty? Pathes) Nodes
+(defn xpath 
+	"xpath"
+	[Nodes Pathes]
+	( let [ Nodes (if (:tag Nodes) (cons Nodes ()) Nodes)	;; convert Node -> [Node]
+					Pathes (if (keyword? Pathes) (cons Pathes ()) Pathes) ;; :name -> [:name]
+				]
+		(if (empty? Pathes) Nodes
 			(recur (xpath-2 Nodes (first Pathes)) (rest Pathes)) 
-	)
+		) )
 )
 
 (defn md5-sum
