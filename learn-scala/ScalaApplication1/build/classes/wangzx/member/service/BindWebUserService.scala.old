@@ -1,0 +1,75 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+package wangzx.member.service
+
+/**
+ * 会员绑定原有用户名
+ */
+class BindWebUserService {
+
+  class Request(
+    @BeanProperty
+    var MbUserId: Int // 会员Id
+    
+    @BeanProperty
+    var WbUserName: String // 原有用户名
+
+    @BeanProperty
+    var WbPassword: String  // 原有用户密码
+  );
+
+  //@OSGiService(filter="db=web")
+  implicit var dataSource: javax.sql.DataSource = _
+  
+  def service(request: Request) {
+    
+    val oldUser = query1?("select * from user where username = ?", request.WbUserName)
+    assert(oldUser != null, "用户名" + request.WbUserName + "不存在")
+    
+    assert(oldUser("password") == md5hex(request.WbPassword),
+                  "用户密码不符")
+    
+    val cnt = queryInt("select count(*) as cnt from UserBandCard where userid = ?", oldUser("userId"))
+    assert(cnt == 0, "该用户已绑定到银行卡")
+
+    val member = query1?("select * from user where userid = ?", request.MbUserId)
+    assert(member != null, "会员不存在")
+    assert(member("typecode") ==? "", "会员类型不对")
+    
+    dataSource.transaction {
+      
+      update("""
+         update user 
+          set username = :username and
+            nickname = :nickname and
+            password = :password and
+            email = :email and
+            emailverified = :emailverified and
+            realname = :realname
+           where userid = :userid
+      """, oldUser + ("userid"->member("userid")) )
+      
+      update("""
+             update user set status = '2' where userid = ?
+        """, member("userid"))
+      
+      //转移网站用户的电子钱包给新会员
+      val ewAccount = query1?("select * from EWAccount where userid = ", oldUser("userid"))
+      if(ewAccount != null) {
+        ewAccount("userid") = member("userid")
+        insertTable("EWAccount", ewAccount)
+        remove("delete from EWAccount where userid = ?", oldUser("userid"))
+      }
+      // 转移网站用户的积分到新会员
+      update("update UserPoint set userid = :new where uerid = :old",
+             "new" -> member("userid"),
+             "old" -> oldUser("userid") )
+      
+    }
+
+  }
+
+}
