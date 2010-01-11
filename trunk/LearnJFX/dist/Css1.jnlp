@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jnlp spec="1.0+" codebase="file:/E:/MyDocuments/NetBeansProjects/LearnJFX/dist/" href="Css1.jnlp">
+    <information>
+        <title>Css1</title>
+        <vendor>王在祥</vendor>
+        <homepage href=""/>
+        <description>Css1</description>
+        <offline-allowed/>
+        <shortcut>
+            <desktop/>
+        </shortcut>
+    </information>
+    <resources>
+        <j2se version="1.5+"/>
+        <extension name="JavaFX Runtime" href="http://dl.javafx.com/1.2/javafx-rt.jnlp"/>
+        <jar href="Css1.jar" main="true"/>
+    </resources>
+    <application-desc main-class="com.sun.javafx.runtime.main.Main">
+        <argument>MainJavaFXScript=learnjfx.Css1</argument>
+    </application-desc>
+    <update check="background">
+</jnlp>

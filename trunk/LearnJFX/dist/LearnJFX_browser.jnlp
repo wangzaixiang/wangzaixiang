@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jnlp spec="1.0+" codebase="http://localhost:8082/servlet/org.netbeans.modules.javafx.project.JnlpDownloadServlet/E%3A/MyDocuments/NetBeansProjects/LearnJFX/dist/" href="LearnJFX_browser.jnlp">
+    <information>
+        <title>LearnJFX</title>
+        <vendor>王在祥</vendor>
+        <homepage href="http://localhost:8082/servlet/org.netbeans.modules.javafx.project.JnlpDownloadServlet/E%3A/MyDocuments/NetBeansProjects/LearnJFX/dist/"/>
+        <description>LearnJFX</description>
+        <offline-allowed/>
+        <shortcut>
+            <desktop/>
+        </shortcut>
+    </information>
+    <resources>
+        <j2se version="1.5+"/>
+        <extension name="JavaFX Runtime" href="http://dl.javafx.com/1.2/javafx-rt.jnlp"/>
+        <jar href="LearnJFX.jar" main="true"/>
+    </resources>
+    <applet-desc name="LearnJFX" main-class="com.sun.javafx.runtime.adapter.Applet" width="200" height="200">
+        <param name="MainJavaFXScript" value="learnjfx.TextNodeExample">
+    </applet-desc>
+    <update check="background">
+</jnlp>
