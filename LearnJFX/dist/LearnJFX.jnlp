@@ -7,7 +7,6 @@
         <description>LearnJFX</description>
         <offline-allowed/>
         <shortcut>
-            <desktop/>
         </shortcut>
     </information>
     <resources>
