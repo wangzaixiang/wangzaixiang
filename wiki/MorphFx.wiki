@@ -12,10 +12,10 @@ a first step webstart example
 [http://wangzaixiang.googlecode.com/svn/trunk/LearnJFX/dist/LearnJFX.jnlp]
 
 try to click the text, the Rectangle, the polygon, the button, a morph outline will appear and you can use the icon to:
-* scala it
-* move it
-* rotate it
+ * scala it
+ * move it
+ * rotate it
 
 = Resources =
-* [http://code.google.com/p/jfxdesigner/] It looks much like i wanted.
-* squeak. for try a use of morph in smalltalk
+ * [http://code.google.com/p/jfxdesigner/] It looks much like i wanted.
+ * squeak. for try a use of morph in smalltalk
