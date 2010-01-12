@@ -1,0 +1,14 @@
+#summary A Morph Design for JavaFX
+
+= Introduction =
+
+What is MorphFx? It aims to implements the morph in Smalltalk, see squeak for example.
+
+MorphFX enable interactable create JavaFX scene nodes, customize it, save as JavaFX source code or FXD format, and reused in JavaFX program.
+
+= Details =
+
+Add your content here.  Format your content with:
+  * Text in *bold* or _italic_
+  * Headings, paragraphs, and lists
+  * Automatic links to other wiki pages
