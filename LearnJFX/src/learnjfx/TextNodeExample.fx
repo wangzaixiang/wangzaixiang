@@ -23,6 +23,9 @@ import javafx.scene.shape.Circle;
 import javafx.scene.paint.Color;
 import javafx.scene.control.Button;
 import java.lang.Math;
+import javafx.scene.shape.Polygon;
+import javafx.animation.Timeline;
+import javafx.animation.KeyFrame;
 
 /**
  * @author 王在祥
@@ -32,20 +35,81 @@ def textNode = Text {
             font: Font {
                 size: 24
             }
-            translateX: 50 translateY: 50
+            translateX: 50 translateY: 250
             // x: 10, y: 30
             content: "HelloWorld"
+            onMousePressed: function(e: MouseEvent) {
+                morphIt(e.node)
+            }
+
         };
 
-def node2 = Rectangle {
+def rectNode = Rectangle {
 	x: 100, y: 100
 	width: 140, height: 90
 	fill: Color.RED
+
+        onMousePressed: function(e:MouseEvent) {
+            var it: Rectangle = e.node as Rectangle;
+            var color = if(it.fill == Color.RED) Color.BLUE else Color.RED;
+            /* var timeLine = Timeline {
+                // repeatCount: Timeline.INDEFINITE;
+                keyFrames: {
+                    at(5s) { it.fill => color }
+                }
+            }
+
+            timeLine.play();
+            */
+            morphIt(it)
+        }
+
 }
 
-def node2Outline = MorphOutline {
-    node: node2
+var polygonNode = Polygon {
+	points : [ 0,0, 100,0, 100,100 ]
+	fill: Color.YELLOW
+        onMousePressed: function(e: MouseEvent) {
+            morphIt(e.node)
+        }
+
+};
+
+var btnNode = Button {
+    text: "确认"
+    font: Font { name: "幼圆" size: 24 }
+    onMousePressed: function(e: MouseEvent) {
+        if(e.controlDown)
+            morphIt(e.node);
+    }
+
 }
+
+
+
+var outline: MorphOutline = null;
+
+function morphIt(node: Node) {
+   if(outline != null){
+        delete outline from outline.scene.content;
+        outline = null;
+    }
+
+    outline = MorphOutline {
+        node: node
+    }
+    
+    var index: Integer = -1;
+    for(x in node.scene.content) {
+        if(x == node) index = indexof x;
+    }
+    if(index >= 0) {
+        insert outline after node.scene.content[index]
+    }
+    
+}
+
+
 
 
 
@@ -82,6 +146,8 @@ def outline = Rectangle {
 class MorphOutline extends CustomNode {
 
     public-init var node: Node;
+
+    override def blocksMouse = true;
 
     override function create(): Node {
         return Group {
@@ -278,11 +344,11 @@ class FloatItem extends CustomNode {
                     ]
                 }
     }
-}
+};
 
-def outline = MorphOutline {
-    node: textNode
-}
+//def outline = MorphOutline {
+//    node: textNode
+//}
 
 
 Stage {
@@ -291,17 +357,13 @@ Stage {
         width: 600
         height: 480
         content: [
-            outline,
+            //outline,
             textNode,
-            node2,
-            node2Outline,
-            Button {
-                text: "Debug"
-                translateX: 200 translateY: 50
-                action: function() {
-                    debug();
-                }
-            }
+            rectNode,
+            //node2Outline,
+            polygonNode,
+            btnNode,
+            //node3Outline,
 
             VBox {
                 translateY: 300 translateX: 10
