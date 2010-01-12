@@ -9,6 +9,8 @@ MorphFX enable interactable create JavaFX scene nodes, customize it, save as Jav
 = Details =
 
 Add your content here.  Format your content with:
-  * Text in *bold* or _italic_
-  * Headings, paragraphs, and lists
-  * Automatic links to other wiki pages
+  * WebStart Example [http://wangzaixiang.googlecode.com/svn/trunk/LearnJFX/dist/LearnJFX.jnlp]
+
+= Resources =
+* [http://code.google.com/p/jfxdesigner/]
+* squeak
