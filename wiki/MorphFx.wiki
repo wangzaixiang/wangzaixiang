@@ -19,7 +19,7 @@ try to click the text, the Rectangle, the polygon, the button, a morph outline w
  * move it
  * rotate it
 
-= ScreenShot =
+= Screenshot =
 [http://docs.google.com/File?id=dcn86kz7_324gdnxbphd_b&this_is_a.jpg]
 
 = Resources =
