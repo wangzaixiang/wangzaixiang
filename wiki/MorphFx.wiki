@@ -20,7 +20,7 @@ try to click the text, the Rectangle, the polygon, the button, a morph outline w
  * rotate it
 
 = Screens =
-`<img src="http://docs.google.com/File?id=dcn86kz7_324gdnxbphd_b"/></img>`
+[http://docs.google.com/File?id=dcn86kz7_324gdnxbphd_b]
 
 = Resources =
  * [http://code.google.com/p/jfxdesigner/] It looks much like i wanted.
