@@ -19,8 +19,8 @@ try to click the text, the Rectangle, the polygon, the button, a morph outline w
  * move it
  * rotate it
 
-= Screens =
-[http://docs.google.com/File?id=dcn86kz7_324gdnxbphd_b?this_is_a.jpg]
+= ScreenShot =
+[http://docs.google.com/File?id=dcn86kz7_324gdnxbphd_b&this_is_a.jpg]
 
 = Resources =
  * [http://code.google.com/p/jfxdesigner/] It looks much like i wanted.
