@@ -35,7 +35,6 @@ import javafx.ext.swing.SwingComponent;
 import javax.swing.JLabel;
 import javax.swing.JRadioButtonMenuItem;
 import java.awt.event.ActionListener;
-import java.lang.UnsupportedOperationException;
 import java.awt.event.ActionEvent;
 import javafx.scene.control.CheckBox;
 import javax.swing.JMenu;
@@ -46,6 +45,7 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.ScrollBar;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Hyperlink;
+import java.lang.RuntimeException;
 
 /**
  * @author 王在祥
@@ -84,6 +84,36 @@ var btnNode = Button {
     font: Font { name: "幼圆" size: 24 }
     translateX: 120
 }
+
+class MouselessControlWrap extends Group {
+
+    public-init var node: Node;
+
+    override def content = bind [
+        node,
+        Rectangle {
+                x: bind node.layoutBounds.minX
+                y: bind node.layoutBounds.minY
+                width: bind node.layoutBounds.width
+                height: bind node.layoutBounds.height
+                fill: Color.TRANSPARENT
+                blocksMouse: true
+                onMousePressed: function(e):Void {
+                    System.out.println('this = {this} e.node = {e.node} {this.onMousePressed} - {e.node.onMousePressed}');
+                    
+                    // TODO it looks there is a bug for call this.onMousePressed
+                    var it: Node = null;
+                    it = this;
+
+                    if(it.onMousePressed != null)
+                        it.onMousePressed(e);
+                }
+        }
+
+    ]
+
+}
+
 
 class MorphOutline extends CustomNode {
 
@@ -315,11 +345,17 @@ class MorphContainer extends Group {
     public-read var selected: Node;
 
     function selectNode(node: Node) {
+        System.out.println("select Node {node}");
         selected = node;
         root.morphOutline = if(node==null) null else MorphOutline {
             node: node
         }
     }
+
+    var morphMousePressed = function(e: MouseEvent) {
+
+    }
+
 
     override var content on replace oldValue[firstIndex .. lastIndex] = newValue {
         // add event for each morph
@@ -327,12 +363,30 @@ class MorphContainer extends Group {
             node.blocksMouse = true; //
             if(node.onMousePressed == null and not (node instanceof MorphOutline))
                 node.onMousePressed = function(e: MouseEvent) {
-                    if(node instanceof Control) {
+                    // check e.node
+                    var morph: Node = e.node;
+                    while(morph != null and morph.parent != this) {
+                        morph = morph.parent;
+                    }
+
+                    if(morph == null) {
+                            throw new RuntimeException("Morph is null");
+                    }
+
+                    /*
+                    if(morph instanceof MouselessControlWrap){
+                        var wrapper = morph as MouselessControlWrap;
+                        morph = wrapper.node;
+                    }
+                    */
+
+                    if(morph instanceof Control) {
                         if(e.controlDown)
-                            selectNode(e.node);
+                            selectNode(morph);
                     }
                     else {
-                        selectNode(e.node);
+                        System.out.println("hello.....");
+                        selectNode(morph);
                     }
             }
         }
@@ -471,7 +525,9 @@ class MorphFxPanel extends Panel {
                 return CheckBox { text: "Check Box" }
             });
             createControlMenu("Label", function() {
-                return Label { text: "Label" }
+                return MouselessControlWrap {
+                    node: Label { text: "Label" }
+                }
             });
             createControlMenu("ListView", function() {
                 return ListView { items: ["Hello", "World"] }
@@ -480,7 +536,8 @@ class MorphFxPanel extends Panel {
                 return ProgressBar { progress: 0.5 }
             });
             createControlMenu("Progress Indicator", function() {
-                return ProgressIndicator { progress: 0.5 }
+                var it = ProgressIndicator { progress: 0.5 };
+                return MouselessControlWrap { node: it }
             });
             createControlMenu("Radio Button", function() {
                 return RadioButton { text: "radio button" }
