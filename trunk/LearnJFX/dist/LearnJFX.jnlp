@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jnlp spec="1.0+" codebase="http://wangzaixiang.googlecode.com/svn/trunk/LearnJFX/dist" href="LearnJFX.jnlp">
+<jnlp spec="1.0+" codebase="http://localhost:8082/servlet/org.netbeans.modules.javafx.project.JnlpDownloadServlet/E%3A/MyDocuments/NetBeansProjects/LearnJFX/dist/" href="LearnJFX.jnlp">
     <information>
         <title>LearnJFX</title>
         <vendor>王在祥</vendor>
-        <homepage href="http://wangzaixiang.googlecode.com/svn/trunk/LearnJFX/dist/"/>
+        <homepage href="http://localhost:8082/servlet/org.netbeans.modules.javafx.project.JnlpDownloadServlet/E%3A/MyDocuments/NetBeansProjects/LearnJFX/dist/"/>
         <description>LearnJFX</description>
         <offline-allowed/>
         <shortcut>
+            <desktop/>
         </shortcut>
     </information>
     <resources>
