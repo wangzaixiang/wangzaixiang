@@ -24,8 +24,28 @@ import javafx.scene.paint.Color;
 import javafx.scene.control.Button;
 import java.lang.Math;
 import javafx.scene.shape.Polygon;
-import javafx.animation.Timeline;
-import javafx.animation.KeyFrame;
+import javafx.scene.shape.Polyline;
+import javafx.scene.control.Control;
+import javafx.scene.control.TextBox;
+import javafx.scene.input.MouseButton;
+import javafx.scene.layout.Panel;
+import javax.swing.JPopupMenu;
+import javax.swing.JMenuItem;
+import javafx.ext.swing.SwingComponent;
+import javax.swing.JLabel;
+import javax.swing.JRadioButtonMenuItem;
+import java.awt.event.ActionListener;
+import java.lang.UnsupportedOperationException;
+import java.awt.event.ActionEvent;
+import javafx.scene.control.CheckBox;
+import javax.swing.JMenu;
+import javafx.scene.control.ListView;
+import javafx.scene.control.ProgressBar;
+import javafx.scene.control.ProgressIndicator;
+import javafx.scene.control.RadioButton;
+import javafx.scene.control.ScrollBar;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.control.Hyperlink;
 
 /**
  * @author 王在祥
@@ -36,113 +56,35 @@ def textNode = Text {
                 size: 24
             }
             translateX: 50 translateY: 250
-            // x: 10, y: 30
             content: "HelloWorld"
-            onMousePressed: function(e: MouseEvent) {
-                morphIt(e.node)
-            }
-
         };
 
 def rectNode = Rectangle {
-	x: 100, y: 100
+	translateX: 150, translateY: 100
 	width: 140, height: 90
 	fill: Color.RED
-
-        onMousePressed: function(e:MouseEvent) {
-            var it: Rectangle = e.node as Rectangle;
-            var color = if(it.fill == Color.RED) Color.BLUE else Color.RED;
-            /* var timeLine = Timeline {
-                // repeatCount: Timeline.INDEFINITE;
-                keyFrames: {
-                    at(5s) { it.fill => color }
-                }
-            }
-
-            timeLine.play();
-            */
-            morphIt(it)
-        }
-
 }
 
 var polygonNode = Polygon {
 	points : [ 0,0, 100,0, 100,100 ]
 	fill: Color.YELLOW
-        onMousePressed: function(e: MouseEvent) {
-            morphIt(e.node)
-        }
-
+        translateX: 200
 };
+
+var textBox = TextBox {
+	text: "SampleText"
+	columns: 12
+	selectOnFocus: true
+        translateY: 150
+};
+
 
 var btnNode = Button {
     text: "确认"
     font: Font { name: "幼圆" size: 24 }
-    onMousePressed: function(e: MouseEvent) {
-        if(e.controlDown)
-            morphIt(e.node);
-    }
-
+    translateX: 120
 }
 
-
-
-var outline: MorphOutline = null;
-
-function morphIt(node: Node) {
-   if(outline != null){
-        delete outline from outline.scene.content;
-        outline = null;
-    }
-
-    outline = MorphOutline {
-        node: node
-    }
-    
-    var index: Integer = -1;
-    for(x in node.scene.content) {
-        if(x == node) index = indexof x;
-    }
-    if(index >= 0) {
-        insert outline after node.scene.content[index]
-    }
-    
-}
-
-
-
-
-
-/*
-def outline = Rectangle {
-            translateX: bind text.boundsInParent.minX,
-            translateY: bind text.boundsInParent.minY
-            //x: bind text.boundsInParent.minX,
-            //y: bind text.boundsInParent.minY
-            width: bind text.boundsInParent.width
-            height: bind text.boundsInParent.height
-            strokeWidth: 1
-            opacity: 0.2
-              
-            var deltaX = 0.0;
-            var deltaY = 0.0;
-            
-            onMousePressed: function (e:  MouseEvent): Void {
-                deltaX = text.translateX - e.sceneX;
-                deltaY = text.translateY - e.sceneY;
-            }
-
-            onMouseDragged: function (e: MouseEvent): Void {
-                System.out.println("x = {e.x} y = {e.y}");
-                text.translateX = e.sceneX + deltaX;
-                text.translateY = e.sceneY + deltaY;
-            }
-        };
-*/
-/*
- rotate node: Drag it to rotate
- scala node: drag it to scala
- */
 class MorphOutline extends CustomNode {
 
     public-init var node: Node;
@@ -266,8 +208,6 @@ class MorphOutline extends CustomNode {
                             else if(e.y < 0 and e.x < 0) {
                                 node.rotate = 180 + angle
                             }
-
-                            System.out.println("{e.y}/{e.x} = {angle}");
                         }
 
                     }
@@ -350,68 +290,264 @@ class FloatItem extends CustomNode {
 //    node: textNode
 //}
 
+var polyLine = Polyline {
+    points: [
+        10.0, 45.0,
+        55.0, 45.0,
+        50.0, 20.0,
+        92.0, 50.0,
+        50.0, 80.0,
+        55.0, 55.0,
+        10.0, 55.0,
+        10.0, 45.0
+    ]
+    stroke:Color.DARKGREEN;
+    strokeWidth:2
+    fill:Color.FORESTGREEN;
+}
+
+class MorphContainer extends Group {
+
+    public-init var root: MorphFxPanel;
+    // the Morph Control Pad
+
+    //var outline: MorphOutline; // child of root
+    public-read var selected: Node;
+
+    function selectNode(node: Node) {
+        selected = node;
+        root.morphOutline = if(node==null) null else MorphOutline {
+            node: node
+        }
+    }
+
+    override var content on replace oldValue[firstIndex .. lastIndex] = newValue {
+        // add event for each morph
+        for(node in content) {
+            node.blocksMouse = true; //
+            if(node.onMousePressed == null and not (node instanceof MorphOutline))
+                node.onMousePressed = function(e: MouseEvent) {
+                    if(node instanceof Control) {
+                        if(e.controlDown)
+                            selectNode(e.node);
+                    }
+                    else {
+                        selectNode(e.node);
+                    }
+            }
+        }
+    }
+}
+
+class MorphSlider extends Panel {
+
+    public-init var root: MorphFxPanel;
+
+    def morphContainer = bind root.morphContainer;
+
+    override def content = bind createForMorph(root.morphContainer.selected);
+
+    function createForMorph(morph: Node): Node {
+        def it = morph;
+        return if(visible==false or it==null) null else VBox {
+        translateY: 300 translateX: 10
+        content: [
+            FloatItem {
+                label: "x:"
+                max: bind root.width
+                value: bind it.translateX with inverse;
+            },
+            FloatItem {
+                label: "y:" max: bind root.height
+                value: bind it.translateY with inverse
+            },
+            FloatItem {
+                label: "rotate"
+                max: 360
+                value: bind it.rotate with inverse
+            }
+            FloatItem {
+                label: "scalaX"
+                max: 5
+                value: bind it.scaleX with inverse
+            }
+            FloatItem {
+                label: "scalaY"
+                max: 5
+                value: bind it.scaleY with inverse
+            }
+            FloatItem {
+                label: "opacity"
+                max: 1.0
+                value: bind it.opacity with inverse
+            }
+        ]
+        };
+
+    }
+
+}
+
+//var morphPropertyPanel1 = MorphPropertyPanel {
+    
+//}
+
+class MyActionListener extends ActionListener {
+    var action: function(e: ActionEvent);
+    override function actionPerformed (e : ActionEvent) : Void {
+        if(action != null) action(e);
+    }
+}
+
+
+class MorphFxPanel extends Panel {
+    // used to show popup
+    var swing: SwingComponent = SwingComponent.wrap(new JLabel(""));
+    var lowest = Rectangle {
+                width: bind this.width
+                height: bind this.height
+                stroke: Color.RED
+                fill: Color.TRANSPARENT
+
+                onMousePressed: function (e: MouseEvent) {
+                    if(e.button == MouseButton.SECONDARY) {
+                        showPopup(e);
+                    }
+                };
+            };
+
+    var morphContainer = MorphContainer {
+        root: this
+    };
+    var morphSlides =  MorphSlider {
+        root: this
+        // morphContainer: bind morphContainer
+    };
+    var morphOutline: Node;
+    var initialNodes: Node[];
+
+    postinit {
+        insert initialNodes into morphContainer.content;
+        initialNodes = null;    // GC
+    }
+
+    override def width = bind scene.width;
+    override def height = bind scene.width;
+
+    override def content = bind [ swing, lowest, morphContainer, morphSlides, morphOutline ];
+
+    function showPopup(e: MouseEvent){
+        // show popup
+        var popup = new JPopupMenu();
+
+        {   // hide or show Slides
+            var hide = if(morphSlides.visible) "hide" else "show";
+            var toggleSliders = new JRadioButtonMenuItem("{hide} Sliders");
+            toggleSliders.setActionCommand(hide);
+            toggleSliders.addActionListener(MyActionListener {
+                action: function(e: ActionEvent) {
+                    morphSlides.visible = (e.getActionCommand() == "show");
+                }
+            });
+            popup.add((toggleSliders));
+        }
+
+        {   // create new nodes
+            def menu = new JMenu("create Controls");
+            var createControlMenu = function(name: String, f: (function():Node)) {
+                var menuItem = new JMenuItem(name);
+                menu.add(menuItem);
+                menuItem.addActionListener(MyActionListener{
+                    action: function(e) {
+                        var node = f();
+                        insert node into morphContainer.content;
+                    }
+                });
+            }
+            createControlMenu("Button", function() {
+                return Button { text: "Button" }
+            });
+            createControlMenu("Check Box", function() {
+                return CheckBox { text: "Check Box" }
+            });
+            createControlMenu("Label", function() {
+                return Label { text: "Label" }
+            });
+            createControlMenu("ListView", function() {
+                return ListView { items: ["Hello", "World"] }
+            });
+            createControlMenu("Progress Bar", function() {
+                return ProgressBar { progress: 0.5 }
+            });
+            createControlMenu("Progress Indicator", function() {
+                return ProgressIndicator { progress: 0.5 }
+            });
+            createControlMenu("Radio Button", function() {
+                return RadioButton { text: "radio button" }
+            });
+            createControlMenu("Scroll Bar", function() {
+                return ScrollBar { min: 1
+                    max: 10
+                    vertical: false
+                }
+            });
+            createControlMenu("Slider", function() {
+                return Slider { min: 1
+                    max: 10
+                    vertical: false
+                }
+            });
+            createControlMenu("Text Box", function() {
+                return TextBox { text: "radio button" }
+            });
+            createControlMenu("Toggle Button", function() {
+                return ToggleButton { text: "toggle button" }
+            });
+            createControlMenu("Hyperlink", function() {
+                return Hyperlink { text: "http://www.javafx.com" }
+            });
+            popup.add(menu);
+
+        }
+
+        {
+            def menu = new JMenu("create Shapes");
+            popup.add(menu);
+        }
+
+
+        popup.show(swing.getJComponent(), e.x, e.y);
+    }
+
+}
+
 
 Stage {
     title: "MyApp"
     scene: Scene {
         width: 600
         height: 480
+
         content: [
+            MorphFxPanel {
+                initialNodes: [
+                    textNode,
+                    rectNode,
+                    polygonNode,
+                    btnNode,
+                    polyLine,
+                    textBox
+                ]
+
+            }
             //outline,
-            textNode,
-            rectNode,
-            //node2Outline,
-            polygonNode,
-            btnNode,
             //node3Outline,
 
-            VBox {
-                translateY: 300 translateX: 10
-                content: [
-                    FloatItem {
-                        label: "x:"
-                        max: 600
-                        value: bind textNode.translateX with inverse;
-                    },
-                    FloatItem {
-                        label: "y:" max: 480
-                        value: bind textNode.translateY with inverse
-                    },
-                    FloatItem {
-                        label: "rotate"
-                        max: 360
-                        value: bind textNode.rotate with inverse
-                    }
-                    FloatItem {
-                        label: "scalaX"
-                        max: 5
-                        value: bind textNode.scaleX with inverse
-                    }
-                    FloatItem {
-                        label: "scalaY"
-                        max: 5
-                        value: bind textNode.scaleY with inverse
-                    }
-                    FloatItem {
-                        label: "opacity"
-                        max: 1.0
-                        value: bind textNode.opacity with inverse
-                    }
-                    FloatItem {
-                        label: "layoutX"
-                        value: bind textNode.layoutX with inverse
-                    }
-                    FloatItem {
-                        label: "layoutY"
-                        value: bind textNode.layoutY with inverse
-                    }
-                ]
-            }
         ]
     }
 }
 
 function debug(){
-    System.out.println("boundsInParent outline = {outline.boundsInParent} \n text = {textNode.boundsInParent}\n");
-    System.out.println("boundsInLocal outline = {outline.boundsInLocal} \n text = {textNode.boundsInLocal}")
+//    System.out.println("boundsInParent outline = {outline.boundsInParent} \n text = {textNode.boundsInParent}\n");
+//    System.out.println("boundsInLocal outline = {outline.boundsInLocal} \n text = {textNode.boundsInLocal}")
 }
