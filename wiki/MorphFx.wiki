@@ -14,7 +14,7 @@ a first step webstart example
 run it as an applet.
 [http://wangzaixiang.googlecode.com/svn/trunk/LearnJFX/dist/LearnJFX.html]
 
-Morph Polyline(WebStart)
+Morph Polyline(webstart)
 [http://wangzaixiang.googlecode.com/svn/trunk/LearnJFX/dist/PolylineEditor.jnlp]
 
 Morph Ployline(Applet)
