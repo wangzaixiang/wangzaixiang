@@ -15,7 +15,7 @@ run it as an applet.
 [http://wangzaixiang.googlecode.com/svn/trunk/LearnJFX/dist/LearnJFX.html]
 
 a new example for Morph Polyline
-[http://wangzaixiang.googlecode.com/svn/trunk/LearnJFX/dist/PolylineEditor.jnlp]
+[http://wangzaixiang.googlecode.com/svn/trunk/LearnJFX/dist/PolylineEditor.jnlp] `<br>` 
 applet: [http://wangzaixiang.googlecode.com/svn/trunk/LearnJFX/dist/PolylineEditor.html]
 
 try to click the text, the Rectangle, the polygon, the button, a morph outline will appear and you can use the icon to:
