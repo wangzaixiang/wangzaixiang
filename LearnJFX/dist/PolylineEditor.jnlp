@@ -15,7 +15,7 @@
         <jar href="LearnJFX.jar" main="true"/>
     </resources>
     <application-desc main-class="com.sun.javafx.runtime.main.Main">
-        <argument>MainJavaFXScript=wangzx.morphfx.TextNodeExample</argument>
+        <argument>MainJavaFXScript=wangzx.morphfx.shapes.PolylineEditor2</argument>
     </application-desc>
     <update check="background">
 </jnlp>
