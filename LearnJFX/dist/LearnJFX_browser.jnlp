@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jnlp spec="1.0+" codebase="http://localhost:8082/servlet/org.netbeans.modules.javafx.project.JnlpDownloadServlet/E%3A/MyDocuments/NetBeansProjects/LearnJFX/LearnJFX/dist/" href="LearnJFX_browser.jnlp">
+<jnlp spec="1.0+" codebase="http://wangzaixiang.googlecode.com/svn/trunk/LearnJFX/dist/" href="LearnJFX_browser.jnlp">
     <information>
         <title>LearnJFX</title>
         <vendor>王在祥</vendor>
-        <homepage href="http://localhost:8082/servlet/org.netbeans.modules.javafx.project.JnlpDownloadServlet/E%3A/MyDocuments/NetBeansProjects/LearnJFX/LearnJFX/dist/"/>
+        <homepage href="http://wangzaixiang.googlecode.com/svn/trunk/LearnJFX/dist/"/>
         <description>LearnJFX</description>
         <offline-allowed/>
         <shortcut>
@@ -16,7 +16,7 @@
         <jar href="LearnJFX.jar" main="true"/>
     </resources>
     <applet-desc name="LearnJFX" main-class="com.sun.javafx.runtime.adapter.Applet" width="200" height="200">
-        <param name="MainJavaFXScript" value="wangzx.morphfx.shapes.PolylineEditor2">
+        <param name="MainJavaFXScript" value="wangzx.morphfx.TextNodeExample">
     </applet-desc>
     <update check="background">
 </jnlp>
