@@ -59,7 +59,7 @@ Also, the UiBinderX interface is extends from UiBinder, and add the follow metho
 =Synchronize Process=
 the synchronize is follows the GWT's VCH design, once a value changed, it fires listener ValueChangeEvent and notify the listener to update its status.
 
-a new class Box<T> such as Box<String>, Box<Date> is defined to contains simple model value, the Box support VCH and can be used in other JavaBeans to support data synchronize.
+a new class Box[T] such as Box[String], Box[Date] is defined to contains simple model value, the Box support VCH and can be used in other JavaBeans to support data synchronize.
 
 the GWT framework always support the VCH and we will directly use it, it support only the "value" property, but it is the general case, so we don't extends it to other property.
 
