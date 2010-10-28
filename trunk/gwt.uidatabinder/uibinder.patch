@@ -1,0 +1,777 @@
+diff -Nur origin//com/google/gwt/uibinder/UiBinder.gwt.xml uibinder//com/google/gwt/uibinder/UiBinder.gwt.xml
+--- origin//com/google/gwt/uibinder/UiBinder.gwt.xml	2010-10-28 11:34:12.686719300 +0800
++++ uibinder//com/google/gwt/uibinder/UiBinder.gwt.xml	2010-10-28 10:29:51.108594300 +0800
+@@ -19,4 +19,9 @@
+   <generate-with class="com.google.gwt.uibinder.rebind.UiBinderGenerator">
+     <when-type-assignable class="com.google.gwt.uibinder.client.UiBinder"/>
+   </generate-with>
++  
++  <generate-with class="com.google.gwt.uibinder.rebind.UiBinderGenerator">
++    <when-type-assignable class="com.google.gwt.uibinder.client.UiDataBinder"/>
++  </generate-with>
++  
+ </module>
+diff -Nur origin//com/google/gwt/uibinder/client/BeanPathElement.java uibinder//com/google/gwt/uibinder/client/BeanPathElement.java
+--- origin//com/google/gwt/uibinder/client/BeanPathElement.java	1970-01-01 08:00:00.000000000 +0800
++++ uibinder//com/google/gwt/uibinder/client/BeanPathElement.java	2010-10-28 11:31:13.514844300 +0800
+@@ -0,0 +1,65 @@
++package com.google.gwt.uibinder.client;
++
++import com.google.gwt.core.client.JavaScriptObject;
++
++/**
++ * JavaBean's path like "bean.field"
++ * 
++ * TODO add support for bound property
++ */
++public class BeanPathElement<O, V> extends PathElement<O, V> {
++
++	/**
++	 * the function to get the field value
++	 */
++	private final JavaScriptObject getter;
++	
++	/**
++	 * the function to set the field value
++	 */
++	private final JavaScriptObject setter;
++	
++	//private final JavaScriptObject listener;
++
++	public BeanPathElement(O owner, String path, JavaScriptObject getter, JavaScriptObject setter, JavaScriptObject listener){
++		super(owner, path);
++		this.getter = getter;
++		this.setter = setter;
++		//this.listener = listener;
++		if(owner != null)
++			addChangeListener(owner);
++		
++	}
++
++	@Override
++	protected void addChangeListener(O owner) {
++		// TODO
++		// listener.apply(owner, this);
++	}
++
++	@Override
++	protected void removeChangeListener(O owner) {
++		// TODO
++	}
++
++	@Override
++	public void setValue(V value) {
++		if(setter != null)
++			setValue(setter, owner, value);
++	}
++
++	private native void setValue(JavaScriptObject setter, O owner, V value) /*-{
++		setter.call(null, owner, value);
++	}-*/;
++
++	@Override
++	public V getValue() {
++		return getValue(getter, owner);
++	}
++
++	private native V getValue(JavaScriptObject getter, O owner) /*-{
++		return getter.call(null, owner);
++	}-*/;
++	
++	
++}
+diff -Nur origin//com/google/gwt/uibinder/client/BindTo.java uibinder//com/google/gwt/uibinder/client/BindTo.java
+--- origin//com/google/gwt/uibinder/client/BindTo.java	1970-01-01 08:00:00.000000000 +0800
++++ uibinder//com/google/gwt/uibinder/client/BindTo.java	2010-10-28 10:33:35.561719300 +0800
+@@ -0,0 +1,12 @@
++package com.google.gwt.uibinder.client;
++
++/**
++ * mark a field bind to another
++ * 
++ * @author wangzaixiang@gmail.com
++ */
++public @interface BindTo {
++
++	String value();
++
++}
+diff -Nur origin//com/google/gwt/uibinder/client/Path.java uibinder//com/google/gwt/uibinder/client/Path.java
+--- origin//com/google/gwt/uibinder/client/Path.java	1970-01-01 08:00:00.000000000 +0800
++++ uibinder//com/google/gwt/uibinder/client/Path.java	2010-10-28 11:29:43.014844300 +0800
+@@ -0,0 +1,54 @@
++package com.google.gwt.uibinder.client;
++
++
++import com.google.gwt.core.client.JavaScriptObject;
++import com.google.gwt.user.client.ui.HasValue;
++
++
++@SuppressWarnings("unchecked")
++public class Path<T> {
++
++	PathElement<?,?> head;
++	
++	Path<T> peer;
++	
++	void setValue(T value){
++		PathElement tail = getLastPathElement();
++		tail.setValue(value);
++	}
++	
++	T	getValue(){
++		PathElement last = getLastPathElement();
++		return (T) last.getValue();
++	}
++
++	private PathElement getLastPathElement() {
++		PathElement it = head;
++		while(it.next != null)
++			it = it.next;
++		
++		return it;
++	}
++
++	public Path<T> append(PathElement pe) {
++		pe.ownerPath = this;
++		if(head == null)
++			head = pe;
++		else getLastPathElement().append(pe);
++		return this;
++	}
++
++	public Path bind(Path<T> that) {
++		peer = that;
++		that.peer = this;
++		return this;
++	}
++	
++	public Path<T> appendBeanProperty(Object owner, String property, JavaScriptObject getter, JavaScriptObject setter){
++		return append(new BeanPathElement(owner, property, getter, setter, null));
++	}
++	
++	public Path<T> appendValuePart(HasValue owner){
++		return append(new ValuePathElement(owner));
++	}
++}
+diff -Nur origin//com/google/gwt/uibinder/client/PathElement.java uibinder//com/google/gwt/uibinder/client/PathElement.java
+--- origin//com/google/gwt/uibinder/client/PathElement.java	1970-01-01 08:00:00.000000000 +0800
++++ uibinder//com/google/gwt/uibinder/client/PathElement.java	2010-10-28 11:31:35.671094300 +0800
+@@ -0,0 +1,62 @@
++package com.google.gwt.uibinder.client;
++
++
++/**
++ * Base Path Element
++ * 
++ */
++@SuppressWarnings("unchecked")
++public abstract class PathElement<O, V> {
++
++	protected O owner;
++
++	final protected String path;
++
++	protected PathElement<V, ?> next;
++
++	protected Path<?> ownerPath;
++
++	protected PathElement(O owner, String path) {
++		this.path = path;
++		this.owner = owner;
++	}
++
++	public void append(PathElement next) {
++		if (this.next == null) {
++			this.next = (PathElement<V, ?>) next;
++			next.setOwner(getValue());
++		} else {
++			this.next.append(next);
++		}
++	}
++
++	public void setOwner(O owner) {
++		O oldOwner = this.owner;
++		this.owner = owner;
++		if (oldOwner != null) {
++			removeChangeListener(oldOwner);
++		}
++		if (owner != null) {
++			addChangeListener(owner);
++		}
++	}
++
++	protected void onValueChanged(V newValue) {
++		if (next != null) {
++			next.setOwner(newValue);
++		} else { // last
++			if (ownerPath.peer != null) {
++				Path<V> peer = (Path<V>) ownerPath.peer;
++				peer.setValue(newValue);
++			}
++		}
++	}
++
++	protected abstract void addChangeListener(O owner);
++
++	protected abstract void removeChangeListener(O owner);
++
++	public abstract void setValue(V value);
++
++	public abstract V getValue();
++}
+diff -Nur origin//com/google/gwt/uibinder/client/UiBinderUtil.java uibinder//com/google/gwt/uibinder/client/UiBinderUtil.java
+--- origin//com/google/gwt/uibinder/client/UiBinderUtil.java	2010-10-28 11:34:12.421094300 +0800
++++ uibinder//com/google/gwt/uibinder/client/UiBinderUtil.java	2010-10-28 11:30:06.421094300 +0800
+@@ -15,6 +15,8 @@
+  */
+ package com.google.gwt.uibinder.client;
+ 
++import java.util.List;
++
+ import com.google.gwt.dom.client.Document;
+ import com.google.gwt.dom.client.Element;
+ import com.google.gwt.dom.client.Node;
+@@ -100,6 +102,16 @@
+   private static void orphan(Node node) {
+     node.getParentNode().removeChild(node);
+   }
++  
++  @SuppressWarnings("unchecked")
++  public static void flush(List<Path> bindings){
++	  
++  }
++  
++  @SuppressWarnings("unchecked")
++  public static void save(List<Path> bindings){
++	  
++  }
+ 
+   /**
+    * Not to be instantiated.
+diff -Nur origin//com/google/gwt/uibinder/client/UiDataBinder.java uibinder//com/google/gwt/uibinder/client/UiDataBinder.java
+--- origin//com/google/gwt/uibinder/client/UiDataBinder.java	1970-01-01 08:00:00.000000000 +0800
++++ uibinder//com/google/gwt/uibinder/client/UiDataBinder.java	2010-10-28 10:29:20.499219300 +0800
+@@ -0,0 +1,17 @@
++package com.google.gwt.uibinder.client;
++
++/**
++ * Mark interface for GWT.create
++ * 
++ * extends UiBinder interface with data binding support.
++ * 
++ * @author wangzaixiang@gmail.com
++ */
++public interface UiDataBinder<U, O> {
++
++	U createAndBindUi(O owner);
++	
++	void flush();
++	
++	void save();
++}
+diff -Nur origin//com/google/gwt/uibinder/client/ValuePathElement.java uibinder//com/google/gwt/uibinder/client/ValuePathElement.java
+--- origin//com/google/gwt/uibinder/client/ValuePathElement.java	1970-01-01 08:00:00.000000000 +0800
++++ uibinder//com/google/gwt/uibinder/client/ValuePathElement.java	2010-10-28 10:31:21.108594300 +0800
+@@ -0,0 +1,50 @@
++package com.google.gwt.uibinder.client;
++
++
++import com.google.gwt.event.logical.shared.ValueChangeEvent;
++import com.google.gwt.event.logical.shared.ValueChangeHandler;
++import com.google.gwt.event.shared.HandlerRegistration;
++import com.google.gwt.user.client.ui.HasValue;
++
++@SuppressWarnings("unchecked")
++public class ValuePathElement<O,V> extends PathElement<O,V> implements ValueChangeHandler<V> {
++	
++	//HasValue<T> owner;
++	
++	HandlerRegistration	registration;
++		
++	public ValuePathElement(HasValue<V> owner){
++		super((O) owner, "value");
++		if(owner != null)
++			addChangeListener((O)owner);
++	}
++
++	@Override
++	public void onValueChange(ValueChangeEvent<V> event) {
++		super.onValueChanged(event.getValue());
++	}
++
++	@Override
++	protected void addChangeListener(O owner) {
++		HasValue<V> valueOwner = (HasValue<V>) owner;
++		registration = valueOwner.addValueChangeHandler(this);
++	}
++
++	@Override
++	protected void removeChangeListener(O owner) {
++		registration.removeHandler();
++	}
++
++	@Override
++	public void setValue(V value) {
++		HasValue<V> valueOwner = (HasValue<V>) owner;
++		valueOwner.setValue(value, true);
++	}
++
++	@Override
++	public V getValue() {
++		HasValue<V> valueOwner = (HasValue<V>) owner;
++		return valueOwner.getValue();
++	}
++	
++}
+diff -Nur origin//com/google/gwt/uibinder/elementparsers/BeanParser.java uibinder//com/google/gwt/uibinder/elementparsers/BeanParser.java
+--- origin//com/google/gwt/uibinder/elementparsers/BeanParser.java	2010-10-28 11:34:12.436719300 +0800
++++ uibinder//com/google/gwt/uibinder/elementparsers/BeanParser.java	2010-10-28 12:01:49.202344300 +0800
+@@ -119,6 +119,14 @@
+         writer.die("In %s, duplicate attribute name: %s", elem, propertyName);
+       }
+ 
++      // for data binding checking
++      String rawValue = elem.fetchAttributeRawValue(propertyName);
++      if(rawValue.startsWith("@") && !rawValue.startsWith("@@")){
++    	  elem.consumeAttribute(propertyName, writer.getOracle().findType(String.class.getCanonicalName()));
++    	  writer.addBind(new PathBuilder(writer, fieldName, type, propertyName),
++    			  new PathBuilder(writer, "owner", writer.getUiOwnerType(), rawValue.substring(1)));    	  
++      }
++      else 
+       if (unfilledRequiredParams.keySet().contains(propertyName)) {
+         JType paramType = unfilledRequiredParams.get(propertyName);
+         String value = elem.consumeAttributeWithDefault(attribute.getName(),
+diff -Nur origin//com/google/gwt/uibinder/elementparsers/BindBuilder.java uibinder//com/google/gwt/uibinder/elementparsers/BindBuilder.java
+--- origin//com/google/gwt/uibinder/elementparsers/BindBuilder.java	1970-01-01 08:00:00.000000000 +0800
++++ uibinder//com/google/gwt/uibinder/elementparsers/BindBuilder.java	2010-10-26 17:08:09.015625000 +0800
+@@ -0,0 +1,37 @@
++package com.google.gwt.uibinder.elementparsers;
++
++
++public class BindBuilder {
++
++	PathBuilder path1, path2;
++
++	public PathBuilder getPath1() {
++		return path1;
++	}
++
++	public void setPath1(PathBuilder path1) {
++		this.path1 = path1;
++	}
++
++	public PathBuilder getPath2() {
++		return path2;
++	}
++
++	public void setPath2(PathBuilder path2) {
++		this.path2 = path2;
++	}
++	
++	public BindBuilder(PathBuilder path1, PathBuilder path2){
++		this.path1 = path1;
++		this.path2 = path2;	
++		if(path1.valueType != path2.valueType){
++			throw new RuntimeException("bind incompatible type of" + path1.valueType + "<->" + path2.valueType);
++		}
++	}
++	
++	public String toSource(){
++		return String.format("addBinding(%s, %s);", path1.toSource(), path2.toSource());
++	}
++
++
++}
+diff -Nur origin//com/google/gwt/uibinder/elementparsers/PathBuilder.java uibinder//com/google/gwt/uibinder/elementparsers/PathBuilder.java
+--- origin//com/google/gwt/uibinder/elementparsers/PathBuilder.java	1970-01-01 08:00:00.000000000 +0800
++++ uibinder//com/google/gwt/uibinder/elementparsers/PathBuilder.java	2010-10-26 17:12:14.343750000 +0800
+@@ -0,0 +1,213 @@
++package com.google.gwt.uibinder.elementparsers;
++
++import com.google.gwt.core.client.JavaScriptObject;
++import com.google.gwt.core.ext.typeinfo.JClassType;
++import com.google.gwt.core.ext.typeinfo.JField;
++import com.google.gwt.core.ext.typeinfo.JMethod;
++import com.google.gwt.core.ext.typeinfo.JType;
++import com.google.gwt.core.ext.typeinfo.NotFoundException;
++import com.google.gwt.core.ext.typeinfo.TypeOracle;
++import com.google.gwt.uibinder.rebind.UiBinderWriter;
++import com.google.gwt.user.client.ui.HasValue;
++
++public class PathBuilder {
++	
++	
++	public static abstract class PathElementBuilder {
++		JClassType ownerType;
++		String	path;
++		JType valueType;
++		
++		PathElementBuilder next;
++
++		public PathElementBuilder getNext() {
++			return next;
++		}
++		
++	}
++	public static class ValuePathElementBuilder extends PathElementBuilder{
++		
++	}
++	public static class BeanPathElementBuilder extends PathElementBuilder {
++		
++		JMethod	getter;
++		JMethod	setter;
++		JField	field;	// when no getter/setter, field used
++		
++		public String getterMethodName(){
++			return ownerType.getQualifiedSourceName().replace('.', '_') + "_get_" + path;
++		}
++		
++		public String setterMethodName(){
++			return ownerType.getQualifiedSourceName().replace('.', '_') + "_set_" + path;
++		}
++		
++		public String getterMethod(){
++			if(getter == null && field != null) 
++				return String.format("private native JavaScriptObject %s() /*-{return function(bean){return bean.@%s::%s; }}-*/;",
++					getterMethodName(), ownerType.getQualifiedSourceName(), field.getName());
++			if(getter != null){
++				return String.format("private native JavaScriptObject %s() /*-{return function(bean){ return bean.@%s::%s()();}}-*/;",
++					getterMethodName(), ownerType.getQualifiedSourceName(), getter.getName());
++			}
++			throw new RuntimeException();
++		}
++
++		public String setterMethod(){
++			if(setter == null && field != null) 
++				return String.format("private native JavaScriptObject %s() /*-{return function(bean, value){bean.@%s::%s = value; }}-*/;",
++					setterMethodName(), ownerType.getQualifiedSourceName(), field.getName());
++			if(setter != null){
++				return String.format("private native JavaScriptObject %s() /*-{return function(bean, value){ return bean.@%s::%s(%s)(value);}}-*/;",
++					setterMethodName(), ownerType.getQualifiedSourceName(), setter.getName(), valueType.getJNISignature());
++			}
++			throw new RuntimeException();
++		}
++
++	}
++	
++	String		defaultPackage;
++	TypeOracle	oracle;
++	String		rootName;
++	PathElementBuilder builders[];
++	JType	valueType;
++
++	
++	public PathElementBuilder[] getBuilders() {
++		return builders;
++	}
++
++
++	private PathElementBuilder builder(UiBinderWriter writer, JClassType type, String path) {
++		JClassType hasValueType = writer.getOracle().findType(HasValue.class.getName());
++		if(hasValueType.isAssignableFrom(type) && "value".equals(path)){
++			ValuePathElementBuilder builder = new ValuePathElementBuilder();
++			builder.ownerType = type;
++			builder.path = path;
++			builder.valueType = findGetValueReturnType(type);
++			return builder;
++		}
++		else {
++			BeanPathElementBuilder builder = new BeanPathElementBuilder();
++			builder.ownerType = type;
++			builder.path = path;
++
++			// find getter
++			builder.getter = findMethod(type, "get" + captical(path), new JType[0]);
++			if(builder.getter != null){
++				JType valueType = builder.getter.getReturnType();
++				builder.setter = findMethod(type, "set" + captical(path), new JType[]{valueType});
++			}
++			builder.field = findPackageAccessibleField(type, path, defaultPackage);
++			if(builder.getter != null)
++				builder.valueType = builder.getter.getReturnType();
++			else if(builder.field != null)
++				builder.valueType = builder.field.getType();
++			
++			return builder;
++		}
++	}
++	
++	private JType findGetValueReturnType(JClassType type){
++		JMethod method = findMethod(type, "getValue", new JType[0]);
++		if(method != null)
++			return method.getReturnType();
++		else
++			return null;
++	}
++	
++	private JField findPackageAccessibleField(JClassType type, String path, String accessPackage) {
++		JField field = type.getField(path);
++		if(field != null) {
++			if(field.isPublic())
++				return field;
++			if(field.isDefaultAccess() && type.getPackage().getName().equals(accessPackage))
++				return field;
++		}
++		
++		JClassType superclass = type.getSuperclass();
++		if(superclass != null){
++			return findPackageAccessibleField(superclass, path, accessPackage);
++		}
++		else return null;
++		
++		
++	}
++
++	private JMethod findMethod(JClassType type, String name, JType[] args) {
++		
++		try {
++			JMethod method = type.getMethod(name, args);
++			return method;
++		}
++		catch(NotFoundException ex){
++		}
++		
++		JClassType superclass = type.getSuperclass();
++		if(superclass != null)
++			return findMethod(superclass, name, args);
++		else
++			return null;
++		
++	}
++
++	private String captical(String path) {
++		return path.substring(0, 1).toUpperCase() + path.substring(1);
++	}
++
++	public PathBuilder(UiBinderWriter writer, String rootName, JClassType ownerType, String pathStr) {
++		this.defaultPackage = ownerType.getPackage().getName();
++		this.rootName = rootName;
++		String pathes[] = pathStr.split("\\.");
++		for(int i = 0; i<pathes.length; i++)
++			pathes[i] = pathes[i].trim();
++		init(writer, rootName, ownerType, pathes);
++	}
++	
++	private void init(UiBinderWriter writer, String ownerName, JClassType type, String pathes[]) {
++		builders = new PathElementBuilder[pathes.length];
++		JType current = type;
++		for(int i = 0; i<pathes.length; i++){
++			String path = pathes[i];
++			if(current instanceof JClassType)
++				builders[i] = builder(writer, (JClassType)current, path);
++			else {
++				throw new RuntimeException("Not a valid type" + current + " require JClassType");  
++			}
++			current = builders[i].valueType;
++		}
++		for(int i=0; i<builders.length-1; i++){
++			builders[i].next = builders[i+1];
++		}
++		this.valueType = builders[builders.length-1].valueType;
++	}
++	
++	/**
++	 * <code>
++	 * bindPathes.add(
++				new Path().appendValuePart(wUserName).bind(
++						new Path().appendBeanProperty(owner, "userName", 
++								wangzx_newuibinder_client_SimpleForm_getUserName(), null)
++								.appendValuePart(null)));
++	 * </code>
++	 */
++	public String toSource(){
++		String stmt = "new Path()";
++		String owner = this.rootName;
++		for(PathElementBuilder builder: builders){
++			if(builder instanceof ValuePathElementBuilder){
++				stmt = stmt + String.format(".appendValuePart(%s)", owner);
++			}
++			else {
++				BeanPathElementBuilder beanBuilder = (BeanPathElementBuilder) builder;
++				stmt = stmt + String.format(".appendBeanProperty(%s, \"%s\", %s(), %s)", 
++						owner, beanBuilder.path, beanBuilder.getterMethodName(), 
++						beanBuilder.next == null ? beanBuilder.setterMethodName() + "()": "null"
++						);
++			}
++			owner = "null";
++		}
++		return stmt;
++	}
++
++}
+diff -Nur origin//com/google/gwt/uibinder/rebind/UiBinderWriter.java uibinder//com/google/gwt/uibinder/rebind/UiBinderWriter.java
+--- origin//com/google/gwt/uibinder/rebind/UiBinderWriter.java	2010-10-28 11:34:12.655469300 +0800
++++ uibinder//com/google/gwt/uibinder/rebind/UiBinderWriter.java	2010-10-28 12:03:59.296094300 +0800
+@@ -26,10 +26,15 @@
+ import com.google.gwt.uibinder.attributeparsers.BundleAttributeParser;
+ import com.google.gwt.uibinder.attributeparsers.BundleAttributeParsers;
+ import com.google.gwt.uibinder.client.UiBinder;
++import com.google.gwt.uibinder.client.UiDataBinder;
+ import com.google.gwt.uibinder.elementparsers.AttributeMessageParser;
+ import com.google.gwt.uibinder.elementparsers.BeanParser;
++import com.google.gwt.uibinder.elementparsers.BindBuilder;
+ import com.google.gwt.uibinder.elementparsers.ElementParser;
+ import com.google.gwt.uibinder.elementparsers.IsEmptyParser;
++import com.google.gwt.uibinder.elementparsers.PathBuilder;
++import com.google.gwt.uibinder.elementparsers.PathBuilder.BeanPathElementBuilder;
++import com.google.gwt.uibinder.elementparsers.PathBuilder.PathElementBuilder;
+ import com.google.gwt.uibinder.rebind.messages.MessagesWriter;
+ import com.google.gwt.uibinder.rebind.model.ImplicitClientBundle;
+ import com.google.gwt.uibinder.rebind.model.ImplicitCssResource;
+@@ -169,6 +174,7 @@
+ 
+   private final List<String> initStatements = new ArrayList<String>();
+   private final List<String> statements = new ArrayList<String>();
++  private final List<BindBuilder> bindings = new ArrayList<BindBuilder>();
+   private final HandlerEvaluator handlerEvaluator;
+   private final MessagesWriter messages;
+   private final Tokenator tokenator = new Tokenator();
+@@ -179,6 +185,8 @@
+    * The type we have been asked to generated, e.g. MyUiBinder
+    */
+   private final JClassType baseClass;
++  
++  private final boolean	isUiDataBinder;
+   /**
+    * The name of the class we're creating, e.g. MyUiBinderImpl
+    */
+@@ -239,6 +247,9 @@
+           + "  interface Binder extends UiBinder<Widget, MyClass> {}\n"
+           + "  GWT.create(Binder.class);");
+     }
++    
++    JClassType uiDataBinderType = oracle.findType(UiDataBinder.class.getName());
++    this.isUiDataBinder = uiDataBinderType.isAssignableFrom(baseClass);
+ 
+     JClassType[] uiBinderTypes = baseClass.getImplementedInterfaces();
+     if (uiBinderTypes.length == 0) {
+@@ -559,6 +570,10 @@
+     return oracle;
+   }
+ 
++  public JClassType	getUiOwnerType(){
++	  return uiOwnerType;
++  }
++  
+   public OwnerClass getOwnerClass() {
+     return ownerClass;
+   }
+@@ -675,8 +690,9 @@
+   void parseDocument(Document doc, PrintWriter printWriter)
+       throws UnableToCompleteException {
+     JClassType uiBinderClass = getOracle().findType(UiBinder.class.getName());
+-    if (!baseClass.isAssignableTo(uiBinderClass)) {
+-      die(baseClass.getName() + " must implement UiBinder");
++    JClassType uiDataBinderClass = getOracle().findType(UiDataBinder.class.getName());
++    if (!baseClass.isAssignableTo(uiBinderClass) && !baseClass.isAssignableTo(uiDataBinderClass)) {
++      die(baseClass.getName() + " must implement UiBinder or UiDataBinder");
+     }
+ 
+     Element documentElement = doc.getDocumentElement();
+@@ -988,6 +1004,9 @@
+     writeAddedStatements(w);
+     w.newline();
+ 
++    if(isUiDataBinder)
++    	writeBindingStatements(w);
++    
+     writeInitStatements(w);
+     w.newline();
+ 
+@@ -1001,15 +1020,61 @@
+     w.write("return %s;", rootField);
+     w.outdent();
+     w.write("}");
++    
++    if(isUiDataBinder){
++    	writeAddBindMethod(w);
++        writeAddedGetterSetter(w);
++        writeFlushSaveMethod(w);
++    }
+ 
+     // Close class
+     w.outdent();
+     w.write("}");
+   }
+ 
++  private void writeFlushSaveMethod(IndentedWriter w) {
++	  w.write("public void flush(){UiBinderUtil.flush(this.bindings);}");
++	  w.write("");
++	  w.write("public void save(){UiBinderUtil.save(this.bindings);}");
++ }
++
++private void writeAddBindMethod(IndentedWriter w) {
++	 w.write("java.util.List<Path> bindings = new java.util.ArrayList<Path>();");
++	 w.write("private void addBinding(Path path1, Path path2){ bindings.add(path1.bind(path2)); }");
++  }
++
++private void writeAddedGetterSetter(IndentedWriter w) {
++	  Map<String, String> methods = new HashMap<String, String>();
++	  for(BindBuilder bindBuilder: bindings){
++		  PathBuilder[] pathes = new PathBuilder[]{bindBuilder.getPath1(), bindBuilder.getPath2()};
++		  for(PathBuilder path: pathes){
++			  for(PathElementBuilder elem: path.getBuilders()){
++				  if(elem instanceof BeanPathElementBuilder){
++					BeanPathElementBuilder it = (BeanPathElementBuilder) elem;
++					methods.put(it.getterMethodName(), it.getterMethod());
++					if(it.getNext() == null)
++						methods.put(it.setterMethodName(), it.setterMethod());
++				  }
++			  }
++		  }
++	  }
++	  
++	  for(String method: methods.values()){
++		  w.write(method);
++	  }
++  }
++
++  private void writeBindingStatements(IndentedWriter w) {
++	
++	  for(BindBuilder bindBuilder: bindings){
++		  w.write(bindBuilder.toSource());
++	  }
++	
++  }
++
+   private void writeClassOpen(IndentedWriter w) {
+-    w.write("public class %s implements UiBinder<%s, %s>, %s {", implClassName,
+-        uiRootType.getParameterizedQualifiedSourceName(), uiOwnerType.getParameterizedQualifiedSourceName(), baseClass.getParameterizedQualifiedSourceName());
++    w.write("public class %s implements %s {", implClassName,
++        /*uiRootType.getParameterizedQualifiedSourceName(), uiOwnerType.getParameterizedQualifiedSourceName(), */baseClass.getParameterizedQualifiedSourceName());
+     w.indent();
+   }
+ 
+@@ -1060,6 +1125,8 @@
+     w.write("import com.google.gwt.core.client.GWT;");
+     w.write("import com.google.gwt.uibinder.client.UiBinder;");
+     w.write("import com.google.gwt.uibinder.client.UiBinderUtil;");
++    w.write("import com.google.gwt.core.client.JavaScriptObject;");
++    w.write("import com.google.gwt.uibinder.client.Path;");
+     w.write("import %s.%s;", uiRootType.getPackage().getName(),
+         uiRootType.getName());
+   }
+@@ -1149,4 +1216,8 @@
+     writeStaticMessagesInstance(w);
+     writeStaticBundleInstances(w);
+   }
++
++  public void addBind(PathBuilder path1, PathBuilder path2) {
++	  bindings.add(new BindBuilder(path1, path2));
++  }
+ }
+diff -Nur origin//com/google/gwt/uibinder/rebind/XMLElement.java uibinder//com/google/gwt/uibinder/rebind/XMLElement.java
+--- origin//com/google/gwt/uibinder/rebind/XMLElement.java	2010-10-28 11:34:12.671094300 +0800
++++ uibinder//com/google/gwt/uibinder/rebind/XMLElement.java	2010-10-16 12:34:11.812500000 +0800
+@@ -227,6 +227,10 @@
+       JType type) throws UnableToCompleteException {
+     return consumeAttributeWithDefault(name, defaultValue, new JType[] { type });
+   }
++  
++  public String fetchAttributeRawValue(String name){
++	  return elem.getAttribute(name);
++  }
+ 
+   /**
+    * Like {@link #consumeAttributeWithDefault(String, String, JType)}, but
