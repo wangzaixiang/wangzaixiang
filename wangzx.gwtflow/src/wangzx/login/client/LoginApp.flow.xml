@@ -1,0 +1,17 @@
+<flow name="LoginApp">
+
+	<events>
+		<event type="" goto=""/>
+	</events>
+	
+	<start name="LoginNode" step="1" title="">
+		<event type="LoginSuccess" goto="UserStatusNode"/>
+		<event type="Register" goto="RegisterNode"/>
+		<event type="ForgotPassword" goto="ForgotPasswordNode"/>
+	</start>
+	
+	<node name="UserStatusNode" step="2" title=""/>
+	
+	<node name="ForgotPasswordNode"/>
+
+</flow>
